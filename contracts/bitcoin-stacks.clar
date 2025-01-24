@@ -78,3 +78,41 @@
         added-at: uint
     }
 )
+
+;; Validator signatures
+(define-map validator-signatures
+    { tx-hash: (buff 32), validator: principal }
+    { signature: (buff 65), timestamp: uint }
+)
+
+;; Bridge balances
+(define-map bridge-balances principal uint)
+
+;; Public Functions - Bridge Administration
+(define-public (initialize-bridge)
+    (begin
+        (asserts! (is-eq tx-sender CONTRACT-DEPLOYER) (err ERROR-NOT-AUTHORIZED))
+        (var-set bridge-paused false)
+        (ok true)
+    )
+)
+
+(define-public (pause-bridge)
+    (begin
+        (asserts! (is-eq tx-sender CONTRACT-DEPLOYER) (err ERROR-NOT-AUTHORIZED))
+        (var-set bridge-paused true)
+        (ok true)
+    )
+)
+
+;; Public Functions - Validator Management
+(define-public (add-validator (validator principal))
+    (begin
+        (asserts! (is-eq tx-sender CONTRACT-DEPLOYER) (err ERROR-NOT-AUTHORIZED))
+        (asserts! (not (is-eq validator addr-zero)) (err ERROR-INVALID-VALIDATOR-ADDRESS))
+        (asserts! (not (get-validator-status validator)) (err ERROR-INVALID-VALIDATOR-ADDRESS))
+        (map-set validators validator { active: true, added-at: u0 })
+        (var-set total-validators (+ (var-get total-validators) u1))
+        (ok true)
+    )
+)
