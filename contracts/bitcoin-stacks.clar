@@ -35,3 +35,46 @@
 (define-constant ERROR-INVALID-RECIPIENT-ADDRESS u1008)
 (define-constant ERROR-INVALID-BTC-ADDRESS u1009)
 (define-constant ERROR-INVALID-TX-HASH u1010)
+
+;; Consensus and Security
+(define-constant ERROR-INSUFFICIENT-VALIDATORS u1011)
+(define-constant ERROR-TIMELOCK-NOT-EXPIRED u1012)
+
+;; Constants
+(define-constant CONTRACT-DEPLOYER tx-sender)
+(define-constant MIN-DEPOSIT-AMOUNT u100000)    ;; Minimum deposit threshold
+(define-constant MAX-DEPOSIT-AMOUNT u1000000000) ;; Maximum deposit cap
+(define-constant REQUIRED-CONFIRMATIONS u6)      ;; Required validator confirmations
+(define-constant MIN-VALIDATORS u3)              ;; Minimum active validators
+(define-constant EMERGENCY-TIMELOCK u144)        ;; 24-hour timelock (in blocks)
+(define-constant addr-zero 'ST000000000000000000002AMW42H)
+
+;; Data Variables
+(define-data-var bridge-paused bool false)
+(define-data-var total-bridged-amount uint u0)
+(define-data-var last-processed-height uint u0)
+(define-data-var last-emergency-withdrawal-height uint u0)
+(define-data-var total-validators uint u0)
+
+;; Data Maps
+;; Deposit tracking
+(define-map deposits 
+    { tx-hash: (buff 32) }
+    {
+        amount: uint,
+        recipient: principal,
+        processed: bool,
+        confirmations: uint,
+        timestamp: uint,
+        btc-sender: (buff 33)
+    }
+)
+
+;; Validator registry
+(define-map validators 
+    principal 
+    {
+        active: bool, 
+        added-at: uint
+    }
+)
