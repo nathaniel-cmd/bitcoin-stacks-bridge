@@ -251,3 +251,43 @@
         )
     )
 )
+
+;; Read-Only Functions
+(define-read-only (get-validator-status (validator principal))
+    (match (map-get? validators validator)
+        validator-info (get active validator-info)
+        false
+    )
+)
+
+(define-read-only (get-bridge-balance (user principal))
+    (default-to u0 (map-get? bridge-balances user))
+)
+
+(define-read-only (validate-deposit-amount (amount uint))
+    (and 
+        (>= amount MIN-DEPOSIT-AMOUNT)
+        (<= amount MAX-DEPOSIT-AMOUNT)
+    )
+)
+
+(define-read-only (is-valid-tx-hash (tx-hash (buff 32)))
+    (and 
+        (not (is-eq tx-hash 0x))
+        (is-eq (len tx-hash) u32)
+    )
+)
+
+(define-read-only (is-valid-signature (signature (buff 65)))
+    (and 
+        (not (is-eq signature 0x))
+        (is-eq (len signature) u65)
+    )
+)
+
+(define-read-only (is-valid-recipient (recipient principal))
+    (and 
+        (not (is-eq recipient addr-zero))
+        (is-some (some recipient))
+    )
+)
